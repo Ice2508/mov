@@ -1,6 +1,6 @@
 import { addHall } from './hallsManagerApi.js';
 import { withLoader } from './apiWrapper.js';
-import { addMovie } from './addDelmoviesApi.js';
+import { addMovie } from './addDelMoviesApi.js';
 import { addSeance, deleteSeance } from './seancesApi.js';
 import { renderAdminLayout, renderAdminPanel } from './renderAdminDashboard.js';
 import seancesManager from './seancesManager.js';
