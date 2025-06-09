@@ -1,0 +1,447 @@
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+ body {
+    background-image: url(img/background.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    font-family: Roboto;
+    transition: background-size 0.3s ease;
+ }
+
+button {
+	border: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+.loading {
+  width: 80px;
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+.show {
+	display: block;
+}
+
+.wrap {
+	max-width: 990px;
+	margin: auto;
+}
+
+.header {
+	width: 100%;
+	height: 68px;
+	padding: 14px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.header__container {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.header__container-img {
+	cursor: pointer;
+}
+
+.header__btn {
+	width: 71px;
+	height: 100%;
+	color: white;
+	background: #16A6AF;
+    font-size: 14px;
+	font-weight: 500;
+	line-height: 16px;
+	text-transform: uppercase;
+	padding: 12px;
+	border-radius: 3px;
+	box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12),
+                0 0 3px 0 rgba(0, 0, 0, 0.24);
+    cursor: pointer;          
+}
+
+.nav {
+	width: 100%;
+	height: 48px;
+}
+
+.calendar__days {
+	display: flex;
+	gap: 1px;
+	height: 100%;
+	align-items: center;
+}
+
+.calendar__day {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 90%;
+	width: calc(100% / 7);
+	border-radius: 2px;
+    background: #FFFFFFE5;
+	padding-left: 15px;
+	cursor: pointer;
+	box-shadow: 0px 0px 2px 0px #0000001F,
+                0px 2px 2px 0px #0000003D;
+}
+
+.calendar__day-active {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+    background: #FFFFFF;
+    line-height: 100%;
+    height: 100%;
+    width: 25%;
+    box-shadow: 0px 0px 2px 0px #0000001F,
+                0px 2px 2px 0px #0000003D;
+}
+
+.calendar__day--next {
+    padding-left: 0;
+	font-family: Consolas, 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 28px;
+    letter-spacing: 0%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.movie-card {
+	padding: 15px;
+	background: #F1EBE6F2;
+	margin-top: 30px;
+	border-radius: 2px;
+}
+
+.movie-card__content {
+	width: 100%;
+	min-height: 175px;
+	display: flex;
+}
+
+.movie-card__poster {
+	width: 125px;
+	height: 175px;
+}
+
+.movie-card__info {
+	width: calc(100% - 125px);
+	padding: 0 15px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.movie-card__details {
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0%;
+}
+
+.movie-card__description {
+	font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0%;
+}
+
+.movie-card__hall {
+	width: 100%;
+	min-height: 63px;
+	margin-bottom: 15px;
+}
+
+.movie-card__hall-title {
+	font-weight: 700;
+	font-size: 16px;
+	line-height: 18px;
+	height: 18px;
+}
+
+.movie-card__hall-sessions {
+     min-height: 37px;
+     margin-top: 7px;
+     display: flex;
+     gap: 4px;
+}
+
+.movie-card__hall-seance {
+	display: flex;
+    justify-content: center;
+	align-items: center;
+	width: 53px;
+	height: 33px;
+	background: #FFFFFF;
+	box-shadow: 0px 0px 2px 0px #0000001F,
+                0px 2px 2px 0px #0000003D;
+    text-decoration: none;
+    color: inherit;
+}
+
+.noactive {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: default;
+}
+/*Страница сеанса*/
+
+.seance {
+	max-width: 990px;
+	border-radius: 2px;
+	background: #F1EBE6F2;
+}
+
+.seance__header {
+	height: 97px;
+	padding: 15px;
+	font-weight: 700;
+    font-size: 16px;
+    line-height: 18px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.seance__header-zoom {
+	display: none;
+	align-items: center;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
+}
+
+.seance__header-zoom-text {
+	width: 90px;
+}
+
+.seance__header-time {
+	font-weight: 300;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    margin: 7px 0;
+}
+
+.seance__map {
+	min-height: 100px;
+    background: #171D24;
+}
+
+.seance__book-ticket {
+	height: 97px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.seance__btn {
+	padding: 12px 56px;
+	color: white;
+	cursor: pointer;
+	border-radius: 3px;
+	text-transform: uppercase;
+	background: #16A6AF;
+	box-shadow: 0px 0px 3px 0px #0000001F,
+                0px 3px 3px 0px #0000003D;
+}
+
+
+.seance__btn-disabled {
+   pointer-events: none;
+   opacity: 0.5;
+   cursor: default;
+}
+
+.seance__map-container {
+	width: 284px;
+	margin: auto;
+    display: flex;  
+    flex-direction: column;
+    padding: 15px 0;
+}
+
+.seance__map-image {
+	margin-bottom: 25px;
+}
+
+.seance__row {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 4px;
+	width: 100%;            
+	justify-content: center;
+}
+
+.seance__seat {
+	flex: 1 1 0;
+	height: 20px;
+	width: 20px;
+	background: black;
+	border: 1px solid #525252;
+}
+
+.seance__seat-info {
+	heigth: 80px;
+	font-weight: 300;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    color: white;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.seance__ticket {
+	width: 20px;
+	height: 20px;
+	border: 1px solid #525252;
+}
+
+.seance__ticket_free {
+	background: white;
+	cursor: pointer;
+}
+
+.seance__ticket_free-vip {
+	background: #F9953A;
+	cursor: pointer;
+}
+
+.seance__ticket_disabled {
+	opacity: 0;
+}
+
+.seance__ticket_selected {
+	box-shadow: 0px 0px 4px 0px #16A6AF;
+    background: #25C4CE;
+}
+
+.seance__ticket-row {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.seance__ticket-item {
+	display: flex;
+	align-items: center;
+	font-weight: 300;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0%;
+ }
+
+.seance__ticket-label {
+	padding-left: 3px;
+}
+
+/*Страница бронирования билета*/
+
+.booking {
+    background: #F1EBE6F2;
+	border-bottom: 4px dotted rgba(255, 165, 0, 0.4);
+	border-top: 4px dotted rgba(255, 165, 0, 0.4);
+	padding-bottom: 30px;
+}
+
+.booking__header {
+	height: 75px;
+	border-bottom: 4px dotted rgba(255, 165, 0, 0.4);
+	align-items: center;
+	display: flex;
+	padding: 0 15px;
+}
+
+.booking__header-title {
+	font-weight: 700;
+    font-size: 22px;
+    line-height: 25px;
+    letter-spacing: 0%;
+    text-transform: uppercase;
+    color: #C76F00;
+ }
+
+.booking__info {
+	font-weight: 400;
+    font-size: 16px;
+    line-height: 18.4px;
+    letter-spacing: 0%;
+    padding: 20px 15px 0;
+}
+
+.booking__info-text {
+     margin-bottom: 10px;
+}
+
+.booking__info span {
+	font-weight: 700;
+}
+
+.booking__btn {
+	margin: 30px 0;
+	text-align: center;
+}
+
+.booking__footer {
+	font-weight: 300;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    padding: 0 15px;
+ }
+
+.booking__footer-qr {
+	margin: 30px 0;
+	text-align: center;
+}
+
+/*Медиазапросы*/
+
+@media (max-width: 960px) {
+	.seance__header-zoom {
+		display: flex;
+	}
+
+
+@media (max-width: 620px) {
+  .calendar__day:first-child {
+  	width: 24%;
+  }
+  .calendar__day {
+  	padding: 0 7px;
+  }
+  
+  .calendar__day-active {
+    width: 24%;
+  }
+}
+
+@media (max-width: 360px) {
+  .header {
+  	padding: 14px 8px;
+  }
+}

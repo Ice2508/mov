@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Администраторская</title>
+	<link rel="icon" href="../img/cinema-icon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="admin.css">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+<body>
+	<div class="wrap">
+		<header class="header">
+			<div class="logo">
+				<div class="a">
+				<img src="../img/logo.png" alt="логотип сайта">
+				<span class="logo__text">администраторская</span>
+			    </div>
+			</div>
+		</header>
+		<main class="main">
+		</main>	
+	</div>
+	<script type="module">
+		const observer = new MutationObserver(() => {
+			const popup = document.querySelector('.popup__remove-seance');
+			document.body.style.overflow = popup ? 'hidden' : 'auto';
+		});
+		observer.observe(document.body, { childList: true, subtree: true });
+	</script>
+	<script src="js/adminMain.js" type="module" defer></script>
+</body>
+</html>
