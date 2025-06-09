@@ -46,7 +46,7 @@ export default function seancesManager(movies, halls, seances) {
           <h3 class="seances-config__movie-title">${movie.film_name}</h3>
           <p class="seances-config__movie-duration">${movie.film_duration} мин</p>
           <div class="seances-config__movie-delete" data-id="${movie.id}">
-            <img class="seances-config__movie-delete-icon" src="../../img/hall.png" alt="delete">
+            <img class="seances-config__movie-delete-icon" src="/img/cart.png alt="delete">
           </div>   
         </div>
       `;
@@ -104,7 +104,7 @@ export default function seancesManager(movies, halls, seances) {
       hallDiv.innerHTML = `
         <h3 class="seances-config__hall-name">${hall.hall_name}</h3>
         <div class="seances-config__hall-content" data-hall-id="${hall.id}">
-          <img class="seances-config__hall-delete-icon" src="../../img/cart.png" alt="корзина удаления сеансов">
+          <img class="seances-config__hall-delete-icon" src="/img/cart.png" alt="корзина удаления сеансов">
         </div>
       `;
       hallsList.appendChild(hallDiv);

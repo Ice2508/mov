@@ -13,7 +13,7 @@ async function manageHalls(halls) {
        <div class="admin-halls">
         <p>- ${hall.hall_name}</p>
         <div class="admin-halls__delete" data-id="${hall.id}">
-            <img src="../../img/hall.png">
+            <img src="/img/hall.png">
         </div>    
       </div>
     `).join('')
