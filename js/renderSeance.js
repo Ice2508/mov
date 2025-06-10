@@ -61,7 +61,7 @@ export async function renderSeancePage(seanceId) {
           <p>${hall.hall_name}</p>
         </div>
         <div class="seance__header-zoom">
-           <img src="../img/hint.png">
+           <img src="/mov/img/hint.png">
            <div class="seance__header-zoom-text">Тапните дважды, чтобы увеличить</div>
         </div>
       </div>

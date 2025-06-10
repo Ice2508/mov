@@ -182,7 +182,7 @@ async function configureHalls(halls) {
     updateButtonState();
   });
 
-  rowsInput.addEventListener('change', () => {
+  rowsInput.addEventListener('input', () => {
     let newRows = parseInt(rowsInput.value);
     if (isNaN(newRows) || newRows <= 0) {
       newRows = 1;
@@ -207,7 +207,7 @@ async function configureHalls(halls) {
     }
   });
 
-  seatsInput.addEventListener('change', () => {
+  seatsInput.addEventListener('input', () => {
     let newSeats = parseInt(seatsInput.value);
     if (isNaN(newSeats) || newSeats <= 0) {
       newSeats = 1;
