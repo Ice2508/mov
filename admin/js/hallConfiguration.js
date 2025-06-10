@@ -24,14 +24,14 @@ async function configureHalls(halls) {
       <p class="hall-config__title">Укажите количество рядов и максимальное количество кресел в ряду:</p>
       <div class="hall-config__form-group">    
         <label for="input_type-rows" class="hall-config__label">Рядов, шт</label>
-        <input type="number" id="input_type-rows" class="hall-config__input" min="1" value="${activeHall?.hall_rows || ''}">
+        <input type="number" id="input_type-rows" class="hall-config__input" min="0" value="${activeHall?.hall_rows || ''}">
       </div>
       <div class="hall-config__form-group">
         <span class="hall-config_x">x</span>
       </div>
       <div class="hall-config__form-group">
         <label for="input_type-seats" class="hall-config__label">Мест, шт</label>
-        <input type="number" id="input_type-seats" class="hall-config__input" min="1" value="${activeHall?.hall_places || ''}">
+        <input type="number" id="input_type-seats" class="hall-config__input" min="0" value="${activeHall?.hall_places || ''}">
       </div>
     </div>
     <div class="hall-config__legend">
