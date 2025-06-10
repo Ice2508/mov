@@ -8,7 +8,6 @@ async function configureHalls(halls) {
   let activeHallIndex = 0;
   let activeHall = halls[activeHallIndex] || null;
 
-  // Создаем вкладки
   const hallTabs = createHallTabs(halls, activeHallIndex, (newIndex, newHall) => {
     activeHallIndex = newIndex;
     activeHall = newHall;
@@ -174,63 +173,39 @@ async function configureHalls(halls) {
     const nextIndex = (currentIndex + 1) % seatTypes.length;
     seat.classList.add(seatTypes[nextIndex]);
 
-    // Обновляем activeHall.hall_config
     activeHall.hall_config = getConfigFromDOM();
-    // Перерисовываем сетку
     const seatsGrid = wrapper.querySelector('.hall-config__seats-grid');
     seatsGrid.innerHTML = generateSeatsGrid(activeHall);
     updateButtonState();
   });
 
-  rowsInput.addEventListener('input', () => {
+  function handleInputChange() {
     let newRows = parseInt(rowsInput.value);
-    if (isNaN(newRows) || newRows <= 0) {
-      newRows = 1;
-      rowsInput.value = 1;
-    } else if (newRows > 15) {
-      newRows = 15;
-      rowsInput.value = 15;
-    }
     let newSeats = parseInt(seatsInput.value);
-    if (isNaN(newSeats) || newSeats <= 0) {
-      newSeats = 1;
-      seatsInput.value = 1;
-    } else if (newSeats > 15) {
-      newSeats = 15;
-      seatsInput.value = 15;
-    }
-    if (activeHall) {
-      updateHallConfig(activeHall, newRows, newSeats);
-      const seatsGrid = wrapper.querySelector('.hall-config__seats-grid');
-      seatsGrid.innerHTML = generateSeatsGrid(activeHall);
-      updateButtonState();
-    }
-  });
 
-  seatsInput.addEventListener('input', () => {
-    let newSeats = parseInt(seatsInput.value);
-    if (isNaN(newSeats) || newSeats <= 0) {
-      newSeats = 1;
-      seatsInput.value = 1;
-    } else if (newSeats > 15) {
-      newSeats = 15;
-      seatsInput.value = 15;
+    // Если значение невалидное или пустое, не устанавливаем 1, а просто выходим
+    if (isNaN(newRows) || isNaN(newSeats)) {
+      return;
     }
-    let newRows = parseInt(rowsInput.value);
-    if (isNaN(newRows) || newRows <= 0) {
-      newRows = 1;
-      rowsInput.value = 1;
-    } else if (newRows > 15) {
-      newRows = 15;
-      rowsInput.value = 15;
-    }
-    if (activeHall) {
+
+    // Ограничиваем значения от 0 до 15
+    newRows = Math.max(0, Math.min(15, newRows));
+    newSeats = Math.max(0, Math.min(15, newSeats));
+
+    // Если значения изменились, обновляем инпуты
+    rowsInput.value = newRows === 0 ? '' : newRows;
+    seatsInput.value = newSeats === 0 ? '' : newSeats;
+
+    if (activeHall && newRows > 0 && newSeats > 0) {
       updateHallConfig(activeHall, newRows, newSeats);
       const seatsGrid = wrapper.querySelector('.hall-config__seats-grid');
       seatsGrid.innerHTML = generateSeatsGrid(activeHall);
       updateButtonState();
     }
-  });
+  }
+
+  rowsInput.addEventListener('input', handleInputChange);
+  seatsInput.addEventListener('input', handleInputChange);
 
   cancelButton.addEventListener('click', () => {
     const initialState = initialStates.get(activeHall?.id);
