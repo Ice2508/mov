@@ -2,28 +2,34 @@ import { addHall } from './hallsManagerApi.js';
 import { withLoader } from './apiWrapper.js';
 import { addMovie } from './addDelMoviesApi.js';
 import { addSeance, deleteSeance } from './seancesApi.js';
-import { renderAdminLayout, renderAdminPanel } from './renderAdminDashboard.js';
-import seancesManager from './seancesManager.js';
+import { renderAdminPanel, updateSeancesSection } from './renderAdminDashboard.js';
+
 
 function closePopup(popup) {
-  if (popup && popup.parentNode) popup.remove();
+  if (popup?.parentNode) popup.remove();
   localStorage.removeItem('dragData');
   window.location.hash = '#admin-dashboard';
+}
+
+function updateLocalStorageList(key, list) {
+  let data = JSON.parse(localStorage.getItem('moviesData')) || { halls: [], films: [], seances: [] };
+  if (!Array.isArray(data[key])) data[key] = [];
+  data[key] = list;
+  localStorage.setItem('moviesData', JSON.stringify(data));
 }
 
 export function renderAddHallPopup() {
   const popup = document.createElement('section');
   popup.classList.add('popup');
-
   popup.innerHTML = `
     <div class="popup__content">
       <div class="popup__title">
         <h3 class="popup__title-text">добавление зала</h3>
-        <span class="popup__close">×</span>
+        <button type="button" class="popup__close" aria-label="Закрыть попап">×</button>
       </div>
       <div class="popup__form">
         <label for="popup__input" class="popup__label">Название зала</label>
-        <input type="text" id="popup__input" class="popup__input">
+        <input type="text" id="popup__input" class="popup__input" name="hall-name" autocomplete="off">
         <div class="popup__actions">
           <button class="admin__btn admin__btn-disabled popup__button--ok">Добавить зал</button>
           <button class="admin__btn popup__button--cancel">Отмена</button>
@@ -43,19 +49,22 @@ export function renderAddHallPopup() {
     addBtn.classList.toggle('admin__btn-disabled', !input.value.trim());
   });
   addBtn.addEventListener('click', async () => {
-    const inputValue = input.value;
-    if (!inputValue.trim()) {
+    const inputValue = input.value.trim();
+    if (!inputValue) {
       alert('Введите название зала');
       return;
     }
-
     try {
       const halls = await withLoader(() => addHall(inputValue));
-      console.log('Список залов:', halls);
+      if (!halls?.length) {
+        alert('Ошибка: сервер не вернул список залов');
+        return;
+      }
+      updateLocalStorageList('halls', halls);
       closePopup(popup);
+      await renderAdminPanel();
     } catch (error) {
-      console.error('Ошибка:', error);
-      alert('Не удалось добавить зал');
+      alert('Не удалось добавить зал: ' + error.message);
     }
   });
 
@@ -65,34 +74,33 @@ export function renderAddHallPopup() {
 export async function renderAddMoviePopup() {
   const popup = document.createElement('section');
   popup.classList.add('popup');
-
   popup.innerHTML = `
     <div class="popup__content">
       <div class="popup__title">
-        <span>Добавление фильма</span>
-        <span class="popup__close">×</span>
+        <h3 class="popup__title-text">Добавление фильма</h3>
+        <button type="button" class="popup__close" aria-label="Закрыть попап">×</button>
       </div>
       <div class="popup__form">
         <div class="popup__form-group">
-          <label class="popup__label" for="movie-title">Название фильма</label>
-          <input class="popup__input" id="movie-title">
+          <label for="movie-title" class="popup__label">Название фильма</label>
+          <input class="popup__input" id="movie-title" name="movie-name" autocomplete="off">
         </div>
         <div class="popup__form-group">
-          <label class="popup__label" for="movie-duration">Длительность, мин</label>
-          <input class="popup__input" id="movie-duration" type="number">
+          <label for="movie-duration" class="popup__label">Длительность, мин</label>
+          <input class="popup__input" id="movie-duration" type="number" name="movie-duration" autocomplete="off">
         </div>
         <div class="popup__form-group">
-          <label class="popup__label" for="movie-description">Описание</label>
-          <textarea class="popup__input popup_input-description" id="movie-description"></textarea>
+          <label for="movie-description" class="popup__label">Описание</label>
+          <textarea class="popup__input popup__input--description" id="movie-description" name="movie-description" autocomplete="off"></textarea>
         </div>
         <div class="popup__form-group">
-          <label class="popup__label" for="movie-country">Страна</label>
-          <input class="popup__input" id="movie-country">
+          <label for="movie-country" class="popup__label">Страна</label>
+          <input class="popup__input" id="movie-country" name="movie-country" autocomplete="off">
         </div>
         <div class="popup__actions popup__actions-movie">
           <button class="admin__btn admin__btn-disabled popup__button--save">Сохранить</button>
           <label for="fileInput" class="admin__btn">Загрузить постер</label>
-          <input type="file" id="fileInput" accept=".png" hidden>
+          <input type="file" id="fileInput" name="movie-poster" accept=".png" hidden>
           <button class="admin__btn popup__button--cancel">Отмена</button>
         </div>
       </div>
@@ -133,13 +141,22 @@ export async function renderAddMoviePopup() {
     const country = countryInput.value.trim();
     const file = fileInput.files[0];
 
+    if (!title || !duration || !description || !country || !file) {
+      alert('Заполните все поля');
+      return;
+    }
+
     try {
       const films = await withLoader(() => addMovie(title, duration, description, country, file));
-      console.log('Список фильмов:', films);
+      if (!films?.length) {
+        alert('Ошибка: сервер не вернул список фильмов');
+        return;
+      }
+      updateLocalStorageList('films', films);
       closePopup(popup);
+      await updateSeancesSection();
     } catch (error) {
-      console.error('Ошибка:', error.message);
-      alert(error.message || 'Не удалось добавить фильм');
+      alert('Не удалось добавить фильм: ' + error.message);
     }
   });
 
@@ -216,40 +233,35 @@ export async function renderAddSeancePopup() {
   addBtn.addEventListener('click', () => {
     const hallId = parseInt(hallSelect.value);
     const movieId = parseInt(movieSelect.value);
-    const time = timeInput.value.slice(0, 5); // HH:MM
+    const time = timeInput.value.slice(0, 5); 
 
     if (!hallId || !movieId || !time) {
       alert('Выберите зал, фильм и время');
       return;
     }
 
-    // Находим фильм и его длительность
     const movie = dragData.movies.find(m => m.id === movieId);
     if (!movie) {
       alert('Фильм не найден');
       return;
     }
-    const duration = movie.film_duration; // в минутах
+    const duration = movie.film_duration; 
 
-    // Вычисляем время начала и окончания нового сеанса в минутах
     const [startHours, startMinutes] = time.split(':').map(Number);
     const startTimeInMinutes = startHours * 60 + startMinutes;
     const endTimeInMinutes = startTimeInMinutes + duration;
 
-    // Проверяем, что сеанс заканчивается не позже 23:59
     if (endTimeInMinutes > 23 * 60 + 59) {
       alert('Сеанс должен заканчиваться не позже 23:59');
       return;
     }
 
-    // Собираем все сеансы для зала (серверные и временные)
     const pendingSeances = JSON.parse(localStorage.getItem('pendingSeances') || '[]');
     const hallSeances = [
       ...(dragData.seances || []).filter(s => s.seance_hallid === hallId || s.seance_hallid === hallId.toString()),
       ...pendingSeances.filter(s => s.seanceHallid === hallId || s.seanceHallid === hallId.toString())
     ];
 
-    // Проверяем пересечения
     const hasOverlap = hallSeances.some(seance => {
       const seanceMovie = dragData.movies.find(m => m.id === (seance.seance_filmid || seance.seanceFilmid));
       if (!seanceMovie) return false;
@@ -259,7 +271,6 @@ export async function renderAddSeancePopup() {
       const seanceStart = seanceHours * 60 + seanceMinutes;
       const seanceEnd = seanceStart + seanceDuration;
 
-      // Пересечение: новый сеанс начинается или заканчивается во время другого
       return (startTimeInMinutes < seanceEnd && endTimeInMinutes > seanceStart);
     });
 
@@ -268,7 +279,6 @@ export async function renderAddSeancePopup() {
       return;
     }
 
-    // Сохраняем данные для будущего запроса
     pendingSeances.push({ seanceHallid: hallId, seanceFilmid: movieId, seanceTime: time });
     localStorage.setItem('pendingSeances', JSON.stringify(pendingSeances));
 
@@ -281,12 +291,11 @@ export async function renderAddSeancePopup() {
 export function renderDeleteSeancePopup(movieName, seanceId) {
   const message = document.createElement('section');
   message.classList.add('popup__remove-seance');
-
   message.innerHTML = `
     <div class="popup__content">
       <div class="popup__title">
-        <span>Удаление сеанса</span>
-        <span class="popup__close">×</span>
+        <h3 class="popup__title-text">Удаление сеанса</h3>
+        <button type="button" class="popup__close" aria-label="Закрыть попап">×</button>
       </div>
       <div class="popup__form">
         <p>Вы действительно хотите снять с сеанса фильм
@@ -302,27 +311,23 @@ export function renderDeleteSeancePopup(movieName, seanceId) {
 
   document.body.appendChild(message);
 
-  const closeBtn = message.querySelector('.popup__close');
-  const cancelBtn = message.querySelector('.popup__button--cancel');
-  const deleteBtn = message.querySelector('.popup__button--ok');
+  const closeMessage = () => message.remove();
 
-  const closePopup = () => {
-    if (message && message.parentNode) message.remove();
-  };
+  message.querySelectorAll('.popup__close, .popup__button--cancel').forEach(btn =>
+    btn.addEventListener('click', closeMessage)
+  );
 
-  closeBtn.addEventListener('click', closePopup);
-  cancelBtn.addEventListener('click', closePopup);
-  deleteBtn.addEventListener('click', async () => {
+  message.querySelector('.popup__button--ok').addEventListener('click', async () => {
     try {
-      console.log('Удаляем сеанс с ID:', seanceId);
       await withLoader(() => deleteSeance(seanceId));
-      localStorage.setItem('scrollPosition', window.scrollY);
-      closePopup();
-      await renderAdminPanel();
+      const data = JSON.parse(localStorage.getItem('moviesData')) || { halls: [], films: [], seances: [] };
+      data.seances = Array.isArray(data.seances) ? data.seances.filter(s => s.id !== +seanceId) : [];
+      localStorage.setItem('moviesData', JSON.stringify(data));
+      closeMessage();
+      await updateSeancesSection(); 
     } catch (error) {
-      console.error('Ошибка при удалении сеанса:', error);
-      alert(`Не удалось удалить сеанс: ${error.message}`);
-      closePopup();
+      alert('Не удалось удалить сеанс: ' + error.message);
+      closeMessage();
     }
   });
 

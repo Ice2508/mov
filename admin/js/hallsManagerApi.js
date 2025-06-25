@@ -11,10 +11,8 @@ export async function addHall(hallName) {
     }
 
     const data = await response.json();
-    console.log('Полный ответ сервера:', data);
-    return data.result.halls; 
+    return data.result.halls;
   } catch (error) {
-    console.error('Ошибка в addHall:', error);
     throw error;
   }
 }
@@ -30,9 +28,6 @@ export async function deleteHall(hallId) {
     }
 
     const data = await response.json();
-    console.log('Удаление прошло успешно. Ответ сервера:', data);
-    
-    // Возвращаем список залов и сеансов
     return {
       halls: data.halls || [],
       seances: data.seances || [],

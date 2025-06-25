@@ -4,16 +4,16 @@ import { withLoader } from './apiWrapper.js';
 function renderLoginForm(container) {
   container.innerHTML = `
     <section class="admin__login">
-      <div class="admin__login-header">авторизация</div>
+      <h2 class="admin__login-header">авторизация</h2>
       <form class="admin__login-form">
         <div class="admin__login-container">
           <div class="admin__login-error"></div>
           <label for="email" class="admin__login-label">E-mail</label>
-          <input id="email" class="admin__login-input" type="email" required>
+          <input id="email" class="admin__login-input" type="email" required autocomplete="email" name="email">
         </div>
         <div class="admin__login-container">
           <label for="password" class="admin__login-label">Пароль</label>
-          <input id="password" class="admin__login-input" type="password" required>
+          <input id="password" class="admin__login-input" type="password" required autocomplete="current-password" name="password">
         </div>
         <button type="submit" class="admin__btn admin__btn_login">Авторизоваться</button>
       </form>
@@ -28,7 +28,7 @@ function renderLoginForm(container) {
 
     try {
       await withLoader(async () => {
-        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 сек задержки
+        await new Promise(resolve => setTimeout(resolve, 500));
         return login({ login: email, password });
       });
       localStorage.setItem('isAuthenticated', 'true');

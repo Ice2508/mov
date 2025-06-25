@@ -1,5 +1,5 @@
 import renderLoginForm from './AuthAdmin.js';
-import { renderAdminLayout, renderAdminPanel } from './renderAdminDashboard.js';
+import { renderAdminPanel } from './renderAdminDashboard.js';
 import { renderAddHallPopup, renderAddMoviePopup, renderAddSeancePopup } from './adminPopup.js';
 
 const logoContainer = document.querySelector('.logo');
@@ -11,7 +11,6 @@ async function router() {
   const header = document.querySelector('.header');
   if (!mainContainer) return;
 
-  // По умолчанию показываем хедер
   if (header) header.style.display = 'block';
   mainContainer.innerHTML = '';
 
@@ -20,11 +19,11 @@ async function router() {
   if (hash === '' || hash === '#/') {
     renderLoginForm(mainContainer);
   } else if (hash === '#admin-dashboard' && isAuthenticated) {
-    const panel = await renderAdminPanel(); // Ожидаем renderAdminPanel
-    mainContainer.appendChild(panel); // Убедимся, что panel добавляется в DOM
+    const panel = await renderAdminPanel();
+    mainContainer.appendChild(panel);
   } else if (hash === '#add-hall' && isAuthenticated) {
     if (header) header.style.display = 'none';
-    mainContainer.appendChild(await renderAddHallPopup()); // Ожидаем renderAddHallPopup
+    mainContainer.appendChild(await renderAddHallPopup());
   } else if (hash === '#add-movie' && isAuthenticated) {
     if (header) header.style.display = 'none';
     mainContainer.appendChild(await renderAddMoviePopup());

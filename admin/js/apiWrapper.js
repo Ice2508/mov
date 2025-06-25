@@ -3,9 +3,9 @@ export async function withLoader(apiCall) {
   if (!loader) {
     loader = document.createElement('img');
     loader.className = 'loading';
-    loader.src = '../img/loading5.gif'; // Абсолютный путь
+    loader.src = '../img/loading5.gif';
+    loader.alt = 'загрузка';
     document.body.appendChild(loader);
-    console.log('Элемент .loading создан динамически');
   }
 
   try {

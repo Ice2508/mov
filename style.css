@@ -57,7 +57,12 @@ a {
 	justify-content: space-between;
 }
 
-.header__container-img {
+.header__logo {
+	font-size: 0;
+	line-height: 0;
+}
+
+.header__img {
 	cursor: pointer;
 }
 
@@ -103,7 +108,7 @@ a {
                 0px 2px 2px 0px #0000003D;
 }
 
-.calendar__day-active {
+.calendar__day--active {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -199,7 +204,7 @@ a {
     color: inherit;
 }
 
-.noactive {
+.movie-card__hall-seance--noactive {
   pointer-events: none;
   opacity: 0.5;
   cursor: default;
@@ -220,6 +225,12 @@ a {
     line-height: 18px;
     display: flex;
     justify-content: space-between;
+}
+
+.seance.zoomed { 
+	transform: scale(1.5) translateX(8px);
+    transform-origin: top center;
+    transition: transform 0.3s ease;
 }
 
 .seance__header-zoom {

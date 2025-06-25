@@ -27,6 +27,12 @@ body::after {
 	z-index: 1;
 }
 
+h1, h2, h3 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: normal;
+}
+
 button {
 	border: none;
 	background: transparent;
@@ -80,7 +86,7 @@ label {
     cursor: pointer;
 }
 
-.a {
+.header__logo-text {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -264,8 +270,10 @@ label {
 }
 
 .popup__close {
-	font-size: 34px;
+	font-size: 38px;
+	font-weight: 700;
 	cursor: pointer;
+	color: white;
 }
 
 .popup__form {
@@ -289,7 +297,7 @@ label {
     color: #757575;
 }
 
-.popup_input-description {
+.popup__input--description {
 	min-height: 80px;
 	resize: none;
 }

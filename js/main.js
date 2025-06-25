@@ -3,7 +3,7 @@ import { renderWeek, calendarClick } from './calendar.js';
 import { renderSeancePage } from './renderSeance.js';
 import { renderBookingPage } from './renderBooking.js'; 
 
-const headerContainerImg = document.querySelector('.header__container-img');
+const headerContainerImg = document.querySelector('.header__img');
 headerContainerImg.onclick = () => {
   window.location.hash = '';
 }
@@ -21,7 +21,6 @@ function router() {
       calendarContainer.style.display = 'block';
       loginBtn.style.display = 'inline-block';
     }
-    // Очищаем localStorage с данными бронирования
     localStorage.removeItem('date');
     localStorage.removeItem('bookingCompleted');
     localStorage.removeItem('qrData');
@@ -36,11 +35,9 @@ function router() {
       calendarContainer.style.display = 'none';
       loginBtn.style.display = 'none';
     }
-    // Очищаем данные о бронировании при переходе к выбору мест
     localStorage.removeItem('bookingCompleted');
     localStorage.removeItem('qrData');
     localStorage.removeItem('bookingSeanceId');
-    console.log('Данные бронирования очищены при переходе к конфигурации зала');
     const seanceId = hash.split('=')[1];
     renderSeancePage(seanceId);
   } else if (hash.startsWith('#booking')) {

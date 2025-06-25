@@ -12,10 +12,9 @@ export async function renderBookingPage(seanceId) {
     return ((seat.row - 1) * movieInfo.rowsLength) + Number(seat.place);
   });
 
-  seatNumbers.sort((a, b) => a - b); // Сортировка по возрастанию
-  const seatString = seatNumbers.join(', '); // Строка с местами
+  seatNumbers.sort((a, b) => a - b);
+  const seatString = seatNumbers.join(', ');
 
-  // Проверяем, завершено ли бронирование для текущего seanceId
   const isBookingCompleted = localStorage.getItem('bookingCompleted') === 'true' && 
                             localStorage.getItem('bookingSeanceId') === seanceId;
   const savedQrData = localStorage.getItem('qrData');
@@ -23,7 +22,7 @@ export async function renderBookingPage(seanceId) {
   mainContainer.innerHTML = `
     <section class="booking">
       <div class="booking__header">
-        <h3 class="booking__header-title">Вы выбрали билеты:</h3>
+        <h2 class="booking__header-title">Вы выбрали билеты:</h2>
       </div>
       <div class="booking__info">
          <p class="booking__info-text">На фильм: <span>${movieInfo.filmName}</span></p>
@@ -36,7 +35,8 @@ export async function renderBookingPage(seanceId) {
         <button class="seance__btn" ${isBookingCompleted ? 'style="display: none;"' : ''}>Получить код бронирования</button>
       </div>
       <div class="booking__footer">
-         <div id="qr-code" class="booking__footer-qr"></div>
+         <div id="qr-code" class="booking__footer-qr" role="img" aria-label="QR-код для бронирования">
+         </div>
          <div class="booking__footer-text">
             ${isBookingCompleted ? `
               <p>Покажите QR-код нашему контроллеру для подтверждения бронирования</p>
@@ -55,61 +55,55 @@ export async function renderBookingPage(seanceId) {
   const qrContainer = document.getElementById('qr-code');
   const footerText = document.querySelector('.booking__footer-text');
   let dateToUse = movieInfo.seanceDay;
-    if (!dateToUse || dateToUse === 'null') {
+  if (!dateToUse || dateToUse === 'null') {
     const today = new Date();
-    dateToUse = today.toLocaleDateString('ru-RU'); // например: "27.05.2025"
+    dateToUse = today.toLocaleDateString('ru-RU');
   }
-  // Если бронирование завершено, восстанавливаем QR-код
+
   if (isBookingCompleted && savedQrData) {
     const qr = QRCreator(savedQrData, {
-      mode: 4, // Октетный режим (UTF-8)
-      eccl: 2, // Уровень коррекции H
-      image: 'PNG', // Формат PNG
-      modsize: 2, // Размер модуля
-      margin: 2 // Отступ
+      mode: 4,
+      eccl: 2,
+      image: 'PNG',
+      modsize: 2,
+      margin: 2
     });
     if (!qr.error) {
-      qrContainer.innerHTML = ''; // Очищаем контейнер
-      qrContainer.append(qr.result); // Добавляем QR-код
+      qrContainer.innerHTML = '';
+      qrContainer.append(qr.result);
     }
   }
 
-  // Обработчик для кнопки, если она есть
   if (bookingBtn) {
     bookingBtn.addEventListener('click', async () => {
       try {
         const response = await buyTickets();
-        console.log(response)
-        // Проверяем, является ли ответ массивом билетов
         if (Array.isArray(response) && response.length > 0) {
           bookingBtn.style.display = 'none';
           footerText.innerHTML = `
               <p>Покажите QR-код нашему контроллеру для подтверждения бронирования</p>
               <p>Приятного просмотра!</p>
             `;
-          // Данные для QR-кода: строка из данных билетов
           const qrData = response.map(ticket => 
             `${ticket.ticket_filmname}, ${ticket.ticket_hallname}, ${dateToUse}, ${ticket.ticket_time}, Ряд ${ticket.ticket_row} Место ${ticket.ticket_place}`
           ).join('; ');
-          // Генерация QR-кода
           const qr = QRCreator(qrData, {
-            mode: 4, // Октетный режим (UTF-8)
-            eccl: 2, // Уровень коррекции H
-            image: 'PNG', // Формат PNG
-            modsize: 2, // Размер модуля
-            margin: 2 // Отступ
+            mode: 4,
+            eccl: 2,
+            image: 'PNG',
+            modsize: 2,
+            margin: 2
           });
           if (!qr.error) {
-            qrContainer.innerHTML = ''; // Очищаем контейнер
-            qrContainer.append(qr.result); // Добавляем QR-код
-            // Сохраняем состояние бронирования
+            qrContainer.innerHTML = '';
+            qrContainer.append(qr.result);
             localStorage.setItem('bookingCompleted', 'true');
             localStorage.setItem('qrData', qrData);
             localStorage.setItem('bookingSeanceId', seanceId);
           }
         }
       } catch (error) {
-        // Ничего не делаем при ошибке
+        console.error('Ошибка при выполнении бронирования:', error);
       }
     });
   }
@@ -132,7 +126,7 @@ function getRublesWord(num) {
 }
 
 export function getSeanceId() {
-  const hash = window.location.hash; // Например: "#booking=1910"
-  const params = new URLSearchParams(hash.slice(1)); // Удаляем #
-  return params.get('booking'); // Вернёт строку "1910"
+  const hash = window.location.hash;
+  const params = new URLSearchParams(hash.slice(1));
+  return params.get('booking');
 }

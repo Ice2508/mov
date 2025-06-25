@@ -9,7 +9,7 @@ export function createHallTabs(halls, activeHallIndex = 0, onHallChange, tabsTit
     : '<p>Нет доступных залов</p>';
 
   nav.innerHTML = `
-    <p class="hall-config__title">${tabsTitle}</p>
+    <h3 class="hall-config__title">${tabsTitle}</h3>
     <ul class="hall-config__list">${hallsList}</ul>
   `;
 

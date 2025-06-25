@@ -8,7 +8,6 @@ async function fetchHallConfig(seanceId, date) {
     }
 
     const data = await response.json();
-    console.log('Конфигурация зала:', data);
     return data;
   } catch (error) {
     console.error('Ошибка при получении конфигурации зала:', error);
@@ -16,4 +15,4 @@ async function fetchHallConfig(seanceId, date) {
   }
 }
 
-export default fetchHallConfig
+export default fetchHallConfig;

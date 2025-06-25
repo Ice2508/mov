@@ -2,8 +2,8 @@ import { createHallTabs } from './hallTabs.js';
 import { setHallStatus } from './setHallStatuApi.js';
 import { withLoader } from './apiWrapper.js';
 
-function configureTicketSales(halls) {
-  const wrapper = document.createElement('section');
+export default function configureTicketSales(halls) {
+  const wrapper = document.createElement('div');
   wrapper.classList.add('ticket-sales-config');
 
   let activeHallIndex = 0;
@@ -51,11 +51,10 @@ function configureTicketSales(halls) {
       wrapper.replaceChild(newHallTabs, hallTabs);
       hallTabs = newHallTabs;
     } catch (error) {
+      console.error('Ошибка при изменении статуса зала:', error);
       alert(`Не удалось изменить статус зала: ${error.message}`);
     }
   });
 
   return wrapper;
 }
-
-export default configureTicketSales;

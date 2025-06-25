@@ -5,8 +5,7 @@ async function fetchAllData() {
       throw new Error(`Ошибка HTTP: ${response.status}`);
     }
     const data = await response.json();
-    console.log(data);
-   return {
+    return {
       halls: data.result.halls,
       films: data.result.films,
       seances: data.result.seances,

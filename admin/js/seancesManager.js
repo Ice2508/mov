@@ -2,7 +2,6 @@ import { deleteMovie } from './addDelMoviesApi.js';
 import { withLoader } from './apiWrapper.js';
 import { addSeance } from './seancesApi.js';
 import { renderDeleteSeancePopup } from './adminPopup.js';
-import { renderAdminPanel } from './renderAdminDashboard.js';
 
 export default function seancesManager(movies, halls, seances) {
   const wrapper = document.createElement('section');
@@ -25,7 +24,7 @@ export default function seancesManager(movies, halls, seances) {
   const saveButton = wrapper.querySelector('.popup__button--save');
 
   addMovieButton.addEventListener('click', () => {
-    localStorage.setItem('scrollPosition', window.scrollY); // Сохраняем позицию скролла
+    localStorage.setItem('scrollPosition', window.scrollY);
     window.location.hash = '#add-movie';
   });
 
@@ -44,9 +43,9 @@ export default function seancesManager(movies, halls, seances) {
         </div>
         <div class="seances-config__movie-info">
           <h3 class="seances-config__movie-title">${movie.film_name}</h3>
-          <p class="seances-config__movie-duration">${movie.film_duration} мин</p>
+          <p class="seances-config__movie-duration">${movie.film_duration} mins</p>
           <div class="seances-config__movie-delete" data-id="${movie.id}">
-            <img class="seances-config__movie-delete-icon" src="/mov/img/hall.png" alt="удаление фильмов">
+            <img class="seances-config__movie-delete-icon" src="/mov/img/movies.png" alt="удаление фильмов">
           </div>   
         </div>
       `;
@@ -67,7 +66,7 @@ export default function seancesManager(movies, halls, seances) {
       movieDiv.addEventListener('touchmove', (e) => {
         if (window.touchData && window.touchData.isDragging) {
           const deltaY = Math.abs(e.touches[0].clientY - window.touchData.startY);
-          if (deltaY > 15) { // Порог для определения скролла
+          if (deltaY > 15) {
             window.touchData.isDragging = false;
           }
         }
@@ -88,15 +87,6 @@ export default function seancesManager(movies, halls, seances) {
     const hasPendingSeances = pendingSeances.length > 0;
     cancelButton.classList.toggle('admin__btn-disabled', !hasPendingSeances);
     saveButton.classList.toggle('admin__btn-disabled', !hasPendingSeances);
-
-    // Восстанавливаем позицию прокрутки
-    const scrollPosition = localStorage.getItem('scrollPosition');
-    if (scrollPosition && window.location.hash === '#admin-dashboard') {
-      setTimeout(() => {
-        window.scrollTo(0, parseInt(scrollPosition));
-        localStorage.removeItem('scrollPosition');
-      }, 0);
-    }
 
     halls.forEach(hall => {
       const hallDiv = document.createElement('div');
@@ -165,16 +155,32 @@ export default function seancesManager(movies, halls, seances) {
           const data = e.dataTransfer.getData('text/plain');
           if (data.startsWith('seance:')) {
             const seanceId = data.split(':')[1];
-            if (seanceId.startsWith('temp-')) return;
-            localStorage.setItem('deleteSeanceId', seanceId);
+            if (seanceId.startsWith('temp-')) {
+              let pendingSeances = JSON.parse(localStorage.getItem('pendingSeances') || '[]');
+              pendingSeances = pendingSeances.filter(seance => seance.id !== seanceId);
+              localStorage.setItem('pendingSeances', JSON.stringify(pendingSeances));
+              renderHalls(halls, seances);
+            } else {
+              localStorage.setItem('deleteSeanceId', seanceId);
+              const movie = movies.find(m => m.id === seances.find(s => s.id === +seanceId)?.seance_filmid);
+              renderDeleteSeancePopup(movie?.film_name || 'Фильм не найден', seanceId);
+            }
           }
         });
 
         deleteIcon.addEventListener('touchend', (e) => {
           if (window.touchData && window.touchData.startsWith('seance:')) {
             const seanceId = window.touchData.split(':')[1];
-            if (seanceId.startsWith('temp-')) return;
-            localStorage.setItem('deleteSeanceId', seanceId);
+            if (seanceId.startsWith('temp-')) {
+              let pendingSeances = JSON.parse(localStorage.getItem('pendingSeances') || '[]');
+              pendingSeances = pendingSeances.filter(seance => seance.id !== seanceId);
+              localStorage.setItem('pendingSeances', JSON.stringify(pendingSeances));
+              renderHalls(halls, seances);
+            } else {
+              localStorage.setItem('deleteSeanceId', seanceId);
+              const movie = movies.find(m => m.id === seances.find(s => s.id === +seanceId)?.seance_filmid);
+              renderDeleteSeancePopup(movie?.film_name || 'Фильм не найден', seanceId);
+            }
             window.touchData = null;
           }
         });
@@ -183,7 +189,7 @@ export default function seancesManager(movies, halls, seances) {
         const pendingHallSeances = pendingSeances
           .filter(seance => seance.seanceHallid === hall.id || seance.seanceHallid === hall.id.toString())
           .map(seance => ({
-            id: `temp-${Date.now()}-${Math.random()}`,
+            id: `temp-${seance.seanceHallid}-${seance.seanceFilmid}-${seance.seanceTime}`,
             seance_hallid: seance.seanceHallid,
             seance_filmid: seance.seanceFilmid,
             seance_time: seance.seanceTime
@@ -241,16 +247,12 @@ export default function seancesManager(movies, halls, seances) {
 
           seanceDiv.addEventListener('dragend', () => {
             deleteIcon.style.display = 'none';
-            if (droppedOnDelete && !seance.id.toString().startsWith('temp-')) {
-              renderDeleteSeancePopup(movie.film_name, seance.id);
-            }
+            droppedOnDelete = false;
           });
 
           seanceDiv.addEventListener('touchend', () => {
             deleteIcon.style.display = 'none';
-            if (droppedOnDelete && !seance.id.toString().startsWith('temp-')) {
-              renderDeleteSeancePopup(movie.film_name, seance.id);
-            }
+            droppedOnDelete = false;
             window.touchData = null;
           });
 
@@ -284,15 +286,19 @@ export default function seancesManager(movies, halls, seances) {
 
     try {
       for (const seance of pendingSeances) {
-        await withLoader(() => addSeance(
+        const result = await withLoader(() => addSeance(
           +seance.seanceHallid,
           +seance.seanceFilmid,
           seance.seanceTime
         ));
+        const moviesData = JSON.parse(localStorage.getItem('moviesData') || '{}');
+        if (result.success && result.result.seances) {
+          moviesData.seances = result.result.seances;
+          localStorage.setItem('moviesData', JSON.stringify(moviesData));
+          renderHalls(moviesData.halls, moviesData.seances);
+        }
       }
       localStorage.removeItem('pendingSeances');
-      localStorage.setItem('scrollPosition', window.scrollY);
-      await renderAdminPanel();
     } catch (error) {
       alert('Не удалось сохранить сеансы');
     }
@@ -306,10 +312,23 @@ export default function seancesManager(movies, halls, seances) {
     if (!filmId) return;
 
     try {
-      const result = await withLoader(() => deleteMovie(filmId));
-      renderMovies(result.films);
-      localStorage.setItem('scrollPosition', window.scrollY);
-      await renderAdminPanel();
+      await withLoader(() => deleteMovie(filmId));
+      let data = JSON.parse(localStorage.getItem('moviesData')) || { halls: [], films: [], seances: [] };
+      if (!Array.isArray(data.films)) data.films = [];
+      if (!Array.isArray(data.seances)) data.seances = [];
+
+      data.films = data.films.filter(film => film.id !== filmId);
+      data.seances = data.seances.filter(seance => seance.seance_filmid !== filmId);
+
+      let pendingSeances = JSON.parse(localStorage.getItem('pendingSeances') || '[]');
+      pendingSeances = pendingSeances.filter(seance => seance.seanceFilmid !== filmId);
+      localStorage.setItem('pendingSeances', JSON.stringify(pendingSeances));
+
+      localStorage.setItem('moviesData', JSON.stringify(data));
+
+      currentHue = 90; 
+      renderMovies(data.films);
+      renderHalls(data.halls, data.seances);
     } catch (error) {
       alert('Не удалось удалить фильм');
     }

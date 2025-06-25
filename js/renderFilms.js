@@ -2,12 +2,12 @@ import fetchAllData from './moviesApi.js';
 
 async function loadDataAndUse() {
   const { halls, films, seances } = await fetchAllData();
-  console.log(halls, films, seances);
-
   const container = document.getElementById('main');
   container.innerHTML = '';
 
-  // Получаем выбранную дату из localStorage
+  // Сохраняем данные в localStorage
+  localStorage.setItem('moviesData', JSON.stringify({ halls, films, seances }));
+
   const savedDate = JSON.parse(localStorage.getItem('date'));
   const todayStr = new Date().toISOString().split('T')[0];
   const isToday = !savedDate || savedDate === todayStr;
@@ -18,7 +18,7 @@ async function loadDataAndUse() {
     card.classList.add('movie-card');
     card.innerHTML = `
       <div class="movie-card__content">
-        <img class="movie-card__poster" src="${film.film_poster}" alt="Постер ${film.film_name}">
+        <img class="movie-card__poster" src="${film.film_poster}" alt="${film.film_name}">
         <div class="movie-card__info">
           <h3 class="movie-card__title">${film.film_name}</h3>
           <p class="movie-card__description">${film.film_description}</p>
@@ -31,7 +31,6 @@ async function loadDataAndUse() {
     hallsContainer.classList.add('movie-card__halls');
 
     halls.forEach(hall => {
-      // Пропускаем залы, где hall_open === 0
       if (hall.hall_open === 0) return;
 
       const hallSeances = seances.filter(s =>
@@ -51,7 +50,7 @@ async function loadDataAndUse() {
           if (isToday) {
             const seanceDateTime = new Date(`${todayStr}T${seance.seance_time}`);
             if (seanceDateTime < now) {
-              className = 'movie-card__hall-seance noactive';
+              className = 'movie-card__hall-seance movie-card__hall-seance--noactive';
             }
           }
 
@@ -66,7 +65,6 @@ async function loadDataAndUse() {
       hallsContainer.appendChild(hallCard);
     });
 
-    // Добавляем карточку фильма только если есть залы с сеансами
     if (hallsContainer.children.length > 0) {
       card.appendChild(hallsContainer);
       container.appendChild(card);

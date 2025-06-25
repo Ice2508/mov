@@ -12,7 +12,8 @@ export const movieInfo = {
 };
 
 export async function renderSeancePage(seanceId) {
-  const { halls, films, seances } = await withLoader(() => fetchAllData());
+  const savedData = JSON.parse(localStorage.getItem('moviesData'));
+  const { halls, films, seances } = savedData;
   const mainContainer = document.getElementById('main');
   
   const date = JSON.parse(localStorage.getItem('date')) || getSelectedDate();
@@ -61,7 +62,7 @@ export async function renderSeancePage(seanceId) {
           <p>${hall.hall_name}</p>
         </div>
         <div class="seance__header-zoom">
-           <img src="/mov/img/hint.png">
+           <img src="/mov/img/hint.png" alt="масштаб схемы зала">
            <div class="seance__header-zoom-text">Тапните дважды, чтобы увеличить</div>
         </div>
       </div>
@@ -97,14 +98,6 @@ export async function renderSeancePage(seanceId) {
         <button class="seance__btn seance__btn-disabled">Забронировать</button>
       </div>
     </section>
-    <style>
-      .seance.zoomed {
-        transform: scale(1.5) translateX(8px);
-        transform-origin: top center;
-        transition: transform 0.3s ease;
-      }
-     
-    </style>
   `;
   
   const bookBtn = mainContainer.querySelector('.seance__btn');

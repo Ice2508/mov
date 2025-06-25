@@ -2,8 +2,8 @@ import { createHallTabs } from './hallTabs.js';
 import sendHallConfig from './hallConfigurationApi.js';
 import { withLoader } from './apiWrapper.js';
 
-async function configureHalls(halls) {
-  const wrapper = document.createElement('section');
+export default async function configureHalls(halls) {
+  const wrapper = document.createElement('div');
   wrapper.classList.add('hall-config');
   let activeHallIndex = 0;
   let activeHall = halls[activeHallIndex] || null;
@@ -20,47 +20,47 @@ async function configureHalls(halls) {
 
   wrapper.innerHTML = `
     <div class="hall-config__form">
-      <p class="hall-config__title">Укажите количество рядов и максимальное количество кресел в ряду:</p>
+      <h3 class="hall-config__title">Укажите количество рядов и максимальное количество кресел в ряду:</h3>
       <div class="hall-config__form-group">    
         <label for="input_type-rows" class="hall-config__label">Рядов, шт</label>
-        <input type="number" id="input_type-rows" class="hall-config__input" min="0" value="${activeHall?.hall_rows || ''}">
+        <input type="number" id="input_type-rows" class="hall-config__input" min="0" value="${activeHall?.hall_rows || ''}" autocomplete="off">
       </div>
       <div class="hall-config__form-group">
-        <span class="hall-config_x">x</span>
+        <span class="hall-config__x">x</span>
       </div>
       <div class="hall-config__form-group">
-        <label for="input_type-seats" class="hall-config__label">Мест, шт</label>
-        <input type="number" id="input_type-seats" class="hall-config__input" min="0" value="${activeHall?.hall_places || ''}">
+        <label for="input_type-seats" class="hall-config__label">Места, шт</label>
+        <input type="number" id="input_type-seats" class="hall-config__input" min="0" value="${activeHall?.hall_places || ''}" autocomplete="off">
       </div>
     </div>
     <div class="hall-config__legend">
-      <p class="hall-config__title">Теперь вы можете указать типы кресел на схеме зала:</p>
+      <h3 class="hall-config__title">Теперь вы можете указать типы кресел на схеме зала:</h3>
       <div class="hall-config__seat-legend">
-          <div class="hall-config__seat-legend-item"> 
-            <div class="hall-config__seat-type hall-config__seat-type--standard" aria-hidden="true"></div>
-            <span>— обычные кресла</span>
-          </div>
-          <div class="hall-config__seat-legend-item">
-            <div class="hall-config__seat-type hall-config__seat-type--vip" aria-hidden="true"></div>
-            <span>— VIP кресла</span>
-          </div>
-          <div class="hall-config__seat-legend-item">
-            <div class="hall-config__seat-type hall-config__seat-type--disabled" aria-hidden="true"></div>
-            <span>— заблокированные (нет кресла)</span>
-          </div>
+        <div class="hall-config__seat-legend-item"> 
+          <div class="hall-config__seat-type hall-config__seat-type--standard" aria-hidden="true"></div>
+          <span>— обычные кресла</span>
         </div>
-        <p class="hall-config__hint">
-          Чтобы изменить вид кресла, нажмите по нему левой кнопкой мыши
-        </p>
-        <div class="hall-config__scheme">
-          <div class="hall-config__screen">экран</div>
-          <div class="hall-config__seats-grid">${generateSeatsGrid(activeHall)}</div>
-        </div>  
+        <div class="hall-config__seat-legend-item">
+          <div class="hall-config__seat-type hall-config__seat-type--vip" aria-hidden="true"></div>
+          <span>— VIP кресла</span>
+        </div>
+        <div class="hall-config__seat-legend-item">
+          <div class="hall-config__seat-type hall-config__seat-type--disabled" aria-hidden="true"></div>
+          <span>— заблокированные (нет кресла)</span>
+        </div>
       </div>
-      <div class="hall-config__buttons">
-        <button class="admin__btn admin__btn-disabled popup__button--cancel">Отмена</button>
-        <button class="admin__btn admin__btn-disabled popup__button--save">Сохранить</button>
-      </div>
+      <p class="hall-config__hint">
+        Чтобы изменить вид кресла, нажмите по нему левой кнопкой мыши
+      </p>
+      <div class="hall-config__scheme">
+        <div class="hall-config__screen">экран</div>
+        <div class="hall-config__seats-grid">${generateSeatsGrid(activeHall)}</div>
+      </div>  
+    </div>
+    <div class="hall-config__buttons">
+      <button class="admin__btn admin__btn-disabled popup__button--cancel">Отмена</button>
+      <button class="admin__btn admin__btn-disabled popup__button--save">Сохранить</button>
+    </div>
   `;
 
   wrapper.prepend(hallTabs);
@@ -183,16 +183,13 @@ async function configureHalls(halls) {
     let newRows = parseInt(rowsInput.value);
     let newSeats = parseInt(seatsInput.value);
 
-    // Если значение невалидное или пустое, не устанавливаем 1, а просто выходим
     if (isNaN(newRows) || isNaN(newSeats)) {
       return;
     }
 
-    // Ограничиваем значения от 0 до 15
     newRows = Math.max(0, Math.min(15, newRows));
     newSeats = Math.max(0, Math.min(15, newSeats));
 
-    // Если значения изменились, обновляем инпуты
     rowsInput.value = newRows === 0 ? '' : newRows;
     seatsInput.value = newSeats === 0 ? '' : newSeats;
 
@@ -243,5 +240,3 @@ async function configureHalls(halls) {
 
   return wrapper;
 }
-
-export default configureHalls;

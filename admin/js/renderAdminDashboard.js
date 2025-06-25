@@ -13,7 +13,7 @@ export async function renderAdminLayout(title, renderContent) {
     <div class="admin-panel__section-header">
       <div class="admin-panel__section-title-wrapper">
         <div class="admin-panel__section-title-decor"></div>
-        <p class="admin-panel__section-title">${title}</p>
+        <h2 class="admin-panel__section-title">${title}</h2>
       </div>
       <button class="admin-panel__section-toggle">
         <img
@@ -50,12 +50,18 @@ export async function renderAdminPanel() {
   mainContainer.innerHTML = '';
   const dashboard = document.createElement('div');
   dashboard.className = 'admin-dashboard';
-  const data = await withLoader(() => fetchAllData());
+
+  // Проверяем localStorage
+  let data = JSON.parse(localStorage.getItem('moviesData'));
+  if (!data) {
+    data = await withLoader(() => fetchAllData());
+    localStorage.setItem('moviesData', JSON.stringify(data));
+  }
+
   const halls = data?.halls || [];
   const films = data?.films || [];
   const seances = data?.seances || [];
 
-  // Извлекаем hall_rows, hall_places, hall_config для всех залов
   const hallRows = halls.map(hall => hall.hall_rows || '');
   const hallPlaces = halls.map(hall => hall.hall_places || '');
   const hallConfigs = halls.map(hall => hall.hall_config || []);
@@ -64,7 +70,7 @@ export async function renderAdminPanel() {
   dashboard.appendChild(await renderAdminLayout('конфигурация залов', () => configureHalls(halls, hallRows, hallPlaces, hallConfigs))); 
   dashboard.appendChild(await renderAdminLayout('конфигурация цен', () => priceManager(halls)));
   dashboard.appendChild(await renderAdminLayout('сетка сеансов', () => seancesManager(films, halls, seances)));
-  dashboard.appendChild(await renderAdminLayout('открыть продажи', () => configureTicketSales(halls)))
+  dashboard.appendChild(await renderAdminLayout('открыть продажи', () => configureTicketSales(halls)));
 
   mainContainer.appendChild(dashboard);
   setTimeout(() => {
@@ -76,14 +82,27 @@ export async function renderAdminPanel() {
     });
   }, 0);
 
-  // Восстанавливаем скролл, если есть scrollPosition
   const scrollPosition = localStorage.getItem('scrollPosition');
-  console.log('Проверка восстановления скролла, scrollPosition:', scrollPosition);
   if (scrollPosition) {
     window.scrollTo(0, parseInt(scrollPosition));
-    console.log('Скролл восстановлен на:', parseInt(scrollPosition));
     localStorage.removeItem('scrollPosition');
   }
 
   return dashboard;
+}
+export async function updateSeancesSection() {
+  const data = JSON.parse(localStorage.getItem('moviesData')) || {};
+  const { films = [], halls = [], seances = [] } = data;
+
+  if (!Array.isArray(films) || !Array.isArray(halls) || !Array.isArray(seances)) {
+    console.error('Invalid data in localStorage:', data);
+    return;
+  }
+
+  const section = document.querySelector('.admin-panel__section:has(.seances-config)');
+  if (section) {
+    const content = section.querySelector('.admin-panel__section-content');
+    content.innerHTML = '';
+    content.appendChild(await seancesManager(films, halls, seances));
+  }
 }

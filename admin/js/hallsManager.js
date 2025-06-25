@@ -1,29 +1,23 @@
-
-
-import fetchAllData from '../../js/moviesApi.js';
-import { renderAddHallPopup } from './adminPopup.js';
 import { deleteHall } from './hallsManagerApi.js';
 import { withLoader } from './apiWrapper.js';
-import { renderAdminPanel } from './renderAdminDashboard.js'
+import { renderAdminPanel } from './renderAdminDashboard.js';
 
-async function manageHalls(halls) {
-  const wrapper = document.createElement('section');
+export default async function manageHalls(halls) {
+  const wrapper = document.createElement('div');
   const hallsList = halls.length > 0 
     ? halls.map(hall => `
-       <div class="admin-halls">
+       <li class="admin-halls">
         <p>- ${hall.hall_name}</p>
         <div class="admin-halls__delete" data-id="${hall.id}">
-            <img src="/mov/img/hall.png">
+            <img src="/img/hall.png" alt="удаление зала">
         </div>    
-      </div>
+      </li>
     `).join('')
-    : ' <p>Нет доступных залов</p>';
-
-  
+    : '<p>Нет доступных залов</p>';
 
   wrapper.innerHTML = `
-    <p>Доступные залы:</p>
-    <div>${hallsList}</div>
+    <h3>Доступные залы:</h3>
+    <ul class="admin-halls__list">${hallsList}</ul>
     <button class="admin__btn">Создать зал</button>
   `;
 
@@ -32,20 +26,24 @@ async function manageHalls(halls) {
     window.location.hash = '#add-hall';
   });
 
+  const adminHallsDelete = wrapper.querySelectorAll('.admin-halls__delete');
+  adminHallsDelete.forEach(hallDelete => {
+    hallDelete.addEventListener('click', async (e) => {
+      const hallId = parseInt(e.currentTarget.dataset.id);
+      try {
+        await withLoader(() => deleteHall(hallId));
+        let data = JSON.parse(localStorage.getItem('moviesData')) || { halls: [], films: [], seances: [] };
+        if (!Array.isArray(data.halls)) {
+          data.halls = [];
+        }
+        data.halls = data.halls.filter(hall => hall.id !== hallId);
+        localStorage.setItem('moviesData', JSON.stringify(data));
+        await renderAdminPanel();
+      } catch (error) {
+        alert('Не удалось удалить зал: ' + error.message);
+      }
+    });
+  });
 
-const adminHallsDelite = wrapper.querySelectorAll('.admin-halls__delete');
-adminHallsDelite.forEach(hallDelite => {
-  hallDelite.addEventListener('click', async (e) => {
-    const hallId = e.currentTarget.dataset.id;
-    await withLoader(() => deleteHall(hallId));
-    const freshData = await fetchAllData(); 
-    const updatedWrapper = await manageHalls(freshData.halls || []);
-    wrapper.replaceWith(updatedWrapper);
-    await renderAdminPanel()
-  })
-})
-
-return wrapper;
+  return wrapper;
 }
-
-export default manageHalls;
