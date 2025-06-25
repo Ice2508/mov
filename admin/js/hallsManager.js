@@ -9,7 +9,7 @@ export default async function manageHalls(halls) {
        <li class="admin-halls">
         <p>- ${hall.hall_name}</p>
         <div class="admin-halls__delete" data-id="${hall.id}">
-            <img src="/img/hall.png" alt="удаление зала">
+            <img src="/mov/img/hall.png" alt="удаление зала">
         </div>    
       </li>
     `).join('')
