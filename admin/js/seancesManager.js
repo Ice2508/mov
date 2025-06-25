@@ -45,7 +45,7 @@ export default function seancesManager(movies, halls, seances) {
           <h3 class="seances-config__movie-title">${movie.film_name}</h3>
           <p class="seances-config__movie-duration">${movie.film_duration} mins</p>
           <div class="seances-config__movie-delete" data-id="${movie.id}">
-            <img class="seances-config__movie-delete-icon" src="/mov/img/movies.png" alt="удаление фильмов">
+            <img class="seances-config__movie-delete-icon" src="/mov/img/hall.png" alt="удаление фильмов">
           </div>   
         </div>
       `;
