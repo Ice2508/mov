@@ -51,7 +51,6 @@ export async function renderAdminPanel() {
   const dashboard = document.createElement('div');
   dashboard.className = 'admin-dashboard';
 
-  // Проверяем localStorage
   let data = JSON.parse(localStorage.getItem('moviesData'));
   if (!data) {
     data = await withLoader(() => fetchAllData());
