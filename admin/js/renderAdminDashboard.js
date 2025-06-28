@@ -51,7 +51,11 @@ export async function renderAdminPanel() {
   const dashboard = document.createElement('div');
   dashboard.className = 'admin-dashboard';
 
-  const data = JSON.parse(localStorage.getItem('moviesData')) || {};
+  let data = JSON.parse(localStorage.getItem('moviesData'));
+  if (data === null) {
+    data = await withLoader(() => fetchAllData());
+    localStorage.setItem('moviesData', JSON.stringify(data));
+  }
 
   const halls = data?.halls || [];
   const films = data?.films || [];
