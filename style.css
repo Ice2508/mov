@@ -147,6 +147,7 @@ a {
 .movie-card__poster {
 	width: 125px;
 	height: 175px;
+	object-fit: cover;
 }
 
 .movie-card__info {

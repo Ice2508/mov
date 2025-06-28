@@ -51,8 +51,7 @@ export async function renderAdminPanel() {
   const dashboard = document.createElement('div');
   dashboard.className = 'admin-dashboard';
 
-  const data = await withLoader(() => fetchAllData());
-  localStorage.setItem('moviesData', JSON.stringify(data));
+  const data = JSON.parse(localStorage.getItem('moviesData')) || {};
 
   const halls = data?.halls || [];
   const films = data?.films || [];

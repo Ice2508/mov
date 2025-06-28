@@ -1,5 +1,6 @@
 import login from './authAdminApi.js';
 import { withLoader } from './apiWrapper.js';
+import fetchAllData from '../../js/moviesApi.js';
 
 function renderLoginForm(container) {
   container.innerHTML = `
@@ -31,7 +32,9 @@ function renderLoginForm(container) {
         await new Promise(resolve => setTimeout(resolve, 500));
         return login({ login: email, password });
       });
+      const data = await withLoader(() => fetchAllData());
       localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('moviesData', JSON.stringify(data));
       window.location.hash = '#admin-dashboard';
     } catch (error) {
       console.error('Ошибка:', error.message);
